@@ -7,11 +7,15 @@ from scr.vocoder.Vocoder import Vocoder
 from scr.aligner.aligner import GraphemeAligner
 import wandb
 from torch.utils.data import  Subset,DataLoader
-from scr.model.model import *
+from scr.model.model import make_model, WarmupWrapper
+
 import torch.optim as optim
 from itertools import islice
 from tqdm import tqdm
 from matplotlib import pyplot as plt
+import torch.nn.functional as F
+import torch
+from torch import nn
 
 
 def get_dataloader(datapath='.', batchSize=10):

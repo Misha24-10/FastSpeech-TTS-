@@ -1,6 +1,6 @@
 from torch import nn
 import torch
-import torch.functional as F
+import torch.nn.functional as F
 import copy
 import math
 

@@ -7,6 +7,7 @@ import torchaudio
 
 import librosa
 from matplotlib import pyplot as plt
+from config import MelSpectrogramConfig
 
 
 class MelSpectrogram(nn.Module):

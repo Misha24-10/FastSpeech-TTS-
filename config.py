@@ -24,6 +24,6 @@ class MelSpectrogramConfig:
     # value of melspectrograms if we fed a silence into `MelSpectrogram`
     pad_value: float = -11.5129251
 
-pathtoweights = '/content/drive/MyDrive/AUDIO_DLA/TTS/Full DS/light-leaf-11.pt'
+pathtoweights = '/content/kind-spaceship-14.pt'
 datapath = '.'
 batchSize = 10
