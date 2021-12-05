@@ -1,17 +1,17 @@
-import scr.config
+import config
 from scr.Dataset.dataset import LJSpeechDataset
 from scr.colator.colator import LJSpeechCollator
 from scr.featurizer.featurizer import MelSpectrogram
-from scr.config import ModelConfig, MelSpectrogramConfig
+from config import ModelConfig, MelSpectrogramConfig
 from scr.vocoder.Vocoder import Vocoder
 from scr.aligner.aligner import GraphemeAligner
-import torch
 import wandb
 from torch.utils.data import  Subset,DataLoader
 from scr.model.model import *
 import torch.optim as optim
 from itertools import islice
 from tqdm import tqdm
+from matplotlib import pyplot as plt
 
 
 def get_dataloader(datapath='.', batchSize=10):
@@ -43,7 +43,7 @@ def train():
     wandb.config = {
         "model_config": modelconfig,
         "mel_config": MelSpectrogramConfig,
-        "batch_size": scr.config.batchSize
+        "batch_size": config.batchSize
     }
     model = make_model(modelconfig.src_vocab, modelconfig.N, modelconfig.fft_hidden, modelconfig.blockconv_filtersize,
                        modelconfig.len_red_filtersize, modelconfig.mel_size, modelconfig.head, modelconfig.dropout).to(device)
@@ -51,7 +51,7 @@ def train():
     loss_second = nn.MSELoss()
     optimizer = optim.Adam(model.parameters(), 0.0003)
     optimizer = WarmupWrapper(1000, optimizer, 0.0006)
-    model.load_state_dict(torch.load(scr.config.pathtoweights))
+    model.load_state_dict(torch.load(config.pathtoweights))
 
     aligner.eval()
     for epoch in range(10):  # loop over the dataset multiple times

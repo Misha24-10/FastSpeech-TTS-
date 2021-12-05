@@ -2,8 +2,8 @@ from dataclasses import dataclass
 from torch import nn
 import torch
 import torchaudio
-from typing import Tuple, Dict, Optional, List, Union
-from scr.config import MelSpectrogramConfig
+from typing import List, Union
+from config import MelSpectrogramConfig
 from torch.nn.utils.rnn import pad_sequence
 from matplotlib import pyplot as plt
 
