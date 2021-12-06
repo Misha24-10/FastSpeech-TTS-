@@ -205,10 +205,9 @@ class Model(nn.Module):
     """
     Feed-Forward Transformer модель
     """
-
-    def __init__(self, embedding, position_emb, encoder, duration_predictor, decoder, position_emb2, generator):
+    def __init__(self,embedding, position_emb, encoder, duration_predictor, decoder, position_emb2, generator):
         super(Model, self).__init__()
-
+       
         self.embedding = embedding
         self.position_emb = position_emb
 
@@ -217,34 +216,47 @@ class Model(nn.Module):
         self.decoder = decoder
         self.position_emb2 = position_emb2
         self.generator = generator
-
-    def forward(self, src, input_dur_inframe=None, device="cuda"):
+        
+    def forward(self, src, input_dur_inframe = None, device="cuda"):
         "-----"
         encode = self.encode(src)
+        duration_predictor = self.duration_predictor(encode)
 
         if input_dur_inframe is not None:
+
             input_dur_inframe = input_dur_inframe.long()
-            outp = torch.zeros((src.shape[0], torch.sum(input_dur_inframe, dim=-1).max(), encode.shape[-1])).to(
-                device)  # [5, Time, 384]
+            outp = torch.zeros((src.shape[0], torch.sum(input_dur_inframe, dim=-1).max(), encode.shape[-1])).to(device) # [5, Time, 384]
             N, L = input_dur_inframe.shape
             for j in range(N):
                 count = 0
                 for k in range(L):
                     kol = input_dur_inframe[j][k]
                     if kol != 0:
-                        outp[j, count:count + kol] = encode[j, k]
+                        outp[j,count:count+kol] = encode[j,k]
                         count += kol
-            decoder = self.decoder(outp)
         else:
-            decoder = self.decoder(encode)
-        duration_predictor = self.duration_predictor(encode)
+            dur_out = duration_predictor
+            input_dur_inframe = torch.round(torch.exp(dur_out.squeeze())).long()
+            outp = torch.zeros((src.shape[0], torch.sum(input_dur_inframe, dim=-1).max(), encode.shape[-1])).to(device) # [5, Time, 384]
+            if input_dur_inframe.dim() == 1:
+                N, L = 1, len(input_dur_inframe)
+            else:
+                N, L = input_dur_inframe.shape
+            for j in range(N):
+                count = 0
+                for k in range(L):
+                    kol = input_dur_inframe[j][k]
+                    if kol != 0:
+                        outp[j,count:count+kol] = encode[j,k]
+                        count += kol
+        decoder = self.decoder(outp)
         mel_spec = torch.permute(self.generator(decoder), (0, 2, 1))
-        return mel_spec, duration_predictor  # reruen both mel_pred and duration_pred
-
+        return mel_spec, duration_predictor # reruen both mel_pred and duration_pred 
+    
     def encode(self, src):
         x = self.position_emb(self.embedding(src))
         return self.encoder(x)
-
+    
     def decode(self, src):
         return self.decoder(self.position_emb2(src))
 

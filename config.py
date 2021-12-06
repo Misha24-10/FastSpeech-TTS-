@@ -24,6 +24,6 @@ class MelSpectrogramConfig:
     # value of melspectrograms if we fed a silence into `MelSpectrogram`
     pad_value: float = -11.5129251
 
-pathtoweights = '/content/kind-spaceship-14.pt'
+pathtoweights = '/content/polar-violet-26.pt'
 datapath = '.'
 batchSize = 10
